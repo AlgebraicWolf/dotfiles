@@ -11,7 +11,7 @@ import XMonad.Util.EZConfig (additionalKeys, removeKeys)
 
 -- Layouts
 import XMonad.Layout.Grid
-
+import XMonad.Layout.Spacing
 import XMonad.Hooks.ManageDocks ( Direction2D(..)
                                 , ToggleStruts(..)
                                 , avoidStruts
@@ -109,6 +109,8 @@ myLogHook = fadeInactiveLogHook 0.9
 myPolybarLogHook dbus = myLogHook <+> dynamicLogWithPP (polybarHook dbus)
 
 -- Layout
+mySpacing = spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True
 myLayout = avoidStruts
+         . mySpacing
          . smartBorders
          $ (layoutHook def)
