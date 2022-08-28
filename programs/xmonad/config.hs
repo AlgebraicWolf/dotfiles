@@ -17,6 +17,7 @@ import XMonad.Hooks.ManageDocks ( Direction2D(..)
                                 , avoidStruts
                                 , docks
                                 )
+import XMonad.Layout.NoBorders ( smartBorders )
 
 import XMonad.Hooks.FadeInactive ( fadeInactiveLogHook )
 
@@ -24,8 +25,9 @@ import XMonad.Hooks.FadeInactive ( fadeInactiveLogHook )
 import qualified Codec.Binary.UTF8.String as UTF8
 import qualified DBus as D
 import qualified DBus.Client as D
--- import XMonad.Hooks.DynamicLog -- Now deprecated
 import XMonad.Hooks.StatusBar.PP
+
+import XMonad.Hooks.EwmhDesktops ( ewmh, ewmhFullscreen )
 
 -- System things
 import System.IO
@@ -39,13 +41,14 @@ main :: IO ()
 main = mkDBusClient >>= main'
 
 main' :: D.Client -> IO ()
-main' dbus = xmonad . docks $ def
+main' dbus = xmonad . docks . ewmh . ewmhFullscreen $ def
   { terminal = myTerminal
   , modMask = myModMask
   , borderWidth = 3
   , normalBorderColor = "#dddddd"
   , focusedBorderColor = "#1681f2"
   , logHook = myPolybarLogHook dbus
+  , layoutHook = myLayout
   }
   `removeKeys`
   [ (myModMask, xK_q)
@@ -104,3 +107,8 @@ polybarHook dbus =
 
 myLogHook = fadeInactiveLogHook 0.9
 myPolybarLogHook dbus = myLogHook <+> dynamicLogWithPP (polybarHook dbus)
+
+-- Layout
+myLayout = avoidStruts
+         . smartBorders
+         $ (layoutHook def)
